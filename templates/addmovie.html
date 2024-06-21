@@ -23,19 +23,35 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="../static/style.css" />
+    <!-- fontawesome -->
+    <script
+      src="https://kit.fontawesome.com/e7761c5b02.js"
+      crossorigin="anonymous"
+    ></script>
   </head>
   <body>
-
     <!-- navbar -->
     <nav class="navbar bg-body-tertiary">
       <div class="container">
         <span class="navbar-brand mb-0 h1">
           <img src="../static/images/logo.png" width="110px" alt="Bookmyshow" />
         </span>
-        
+
         <div>
-          <button type="button" class="fw-bold border-0 me-3" style="background-color: inherit;" ><a class="text-black text-decoration-none" href="/admin">Home</a></button>
-            <button type="button" class="text-danger fw-bold border-0" style="background-color: inherit;" ><a class="text-danger text-decoration-none" href="/">Logout</a></button>
+          <button
+            type="button"
+            class="fw-bold border-0 me-3"
+            style="background-color: inherit"
+          >
+            <a class="text-black text-decoration-none" href="/admin">Home</a>
+          </button>
+          <button
+            type="button"
+            class="text-danger fw-bold border-0"
+            style="background-color: inherit"
+          >
+            <a class="text-danger text-decoration-none" href="/">Logout</a>
+          </button>
         </div>
       </div>
     </nav>
@@ -45,112 +61,130 @@
       class="container d-flex justify-content-center align-items-center mt-5"
     >
       <div
-        class="loginBox w-75 p-5 h-50"
+        class="loginBox w-100 p-5 h-50"
         style="box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px"
       >
         <h3 class="fw-bold">Add a <span class="text-danger">movie</span></h3>
-
-        <form id="movieForm" action="/add" method="POST">
-          <!-- Name -->
-          <div class="form-floating mb-3">
-            <input
-              type="text"
-              class="form-control"
-              id="floatingInput"
-              name="moviename"
-              style="
-                border: none;
-                border-bottom: 2px solid #999;
-                border-radius: 0%;
-              "
-            />
-            <label for="floatingInput">Movie Name</label>
+        <div class="d-flex">
+          <div class="w-25">
+            <form id="movieForm" action="/add" method="POST" enctype="multipart/form-data">
+            <label>
+              <input type="file" name="poster" style="display: none;">
+              <div class="movie" style="cursor: pointer;">
+                <div
+                  class="card d-flex justify-content-center align-items-center"
+                >
+                  <i class="fa-regular fa-image fa-2xl"></i>
+                  <div class="card-body text-white justify-content-center">
+                    Upload Movie Poster
+                  </div>
+                </div>
+              </div>
+            </label>
           </div>
 
-          <!-- length -->
-          <div class="form-floating mb-3">
-            <input
-              type="text"
-              class="form-control"
-              id="floatingInput"
-              name="length"
-              style="
-                border: none;
-                border-bottom: 2px solid #999;
-                border-radius: 0%;
-              "
-            />
-            <label for="floatingInput">length</label>
+          <div class="w-75">
+              <!-- Name -->
+              <div class="form-floating mb-3">
+                <input
+                  type="text"
+                  class="form-control"
+                  id="floatingInput"
+                  name="moviename"
+                  style="
+                    border: none;
+                    border-bottom: 2px solid #999;
+                    border-radius: 0%;
+                  "
+                />
+                <label for="floatingInput">Movie Name</label>
+              </div>
+
+              <!-- length -->
+              <div class="form-floating mb-3">
+                <input
+                  type="text"
+                  class="form-control"
+                  id="floatingInput"
+                  name="length"
+                  style="
+                    border: none;
+                    border-bottom: 2px solid #999;
+                    border-radius: 0%;
+                  "
+                />
+                <label for="floatingInput">length</label>
+              </div>
+
+              <!-- genre -->
+              <div class="form-floating mb-3">
+                <input
+                  type="text"
+                  class="form-control"
+                  id="floatingInput"
+                  name="genre"
+                  style="
+                    border: none;
+                    border-bottom: 2px solid #999;
+                    border-radius: 0%;
+                  "
+                />
+                <label for="floatingInput">genre</label>
+              </div>
+
+              <!-- languge -->
+              <div>
+                <select
+                  style="
+                    border: none;
+                    border-bottom: 2px solid #999;
+                    border-radius: 0%;
+                  "
+                  name="lang"
+                  class="form-select form-control mb-3 mt-4"
+                  aria-label="Default select example"
+                >
+                  <option selected>Select a Language</option>
+                  <option value="Malayalam">Malayalam</option>
+                  <option value="Kannada">Kannada</option>
+                  <option value="Telugu">Telugu</option>
+                  <option value="Tamil">Tamil</option>
+                  <option value="Hindi">Hindi</option>
+                  <option value="English">English</option>
+                </select>
+              </div>
+
+              <!-- format -->
+              <div>
+                <select
+                  style="
+                    border: none;
+                    border-bottom: 2px solid #999;
+                    border-radius: 0%;
+                  "
+                  name="format"
+                  class="form-select form-control mb-3 mt-4"
+                  aria-label="Default select example"
+                >
+                  <option selected>Select a format</option>
+                  <option value=" 2D">2D</option>
+                  <option value="3D">3D</option>
+                  <option value="4DX">4DX</option>
+                  <option value="IMAX">IMAX</option>
+                </select>
+              </div>
+
+              <!-- button -->
+              <button
+                type="submit"
+                class="btn btn-danger form-control mt-3"
+                style="border-radius: 0%"
+              >
+                Add
+              </button>
+            </form>
           </div>
-
-          <!-- genre -->
-          <div class="form-floating mb-3">
-            <input
-              type="text"
-              class="form-control"
-              id="floatingInput"
-               name="genre"
-              style="
-                border: none;
-                border-bottom: 2px solid #999;
-                border-radius: 0%;
-              "
-            />
-            <label for="floatingInput">genre</label>
-          </div>
-
-          <!-- languge -->
-          <div>
-            <select
-              style="
-                border: none;
-                border-bottom: 2px solid #999;
-                border-radius: 0%;
-              "
-              name="lang"
-              class="form-select form-control mb-3 mt-4"
-              aria-label="Default select example"
-            >
-              <option selected>Select a Language</option>
-              <option value="Malayalam">Malayalam</option>
-              <option value="Kannada">Kannada</option>
-              <option value="Telugu">Telugu</option>
-              <option value="Tamil">Tamil</option>
-              <option value="Hindi">Hindi</option>
-              <option value="English">English</option>
-
-            </select>
-          </div>
-
-          <!-- format -->
-          <div>
-            <select
-              style="
-                border: none;
-                border-bottom: 2px solid #999;
-                border-radius: 0%;
-              "
-              name="format"
-              class="form-select form-control mb-3 mt-4"
-              aria-label="Default select example"
-            >
-              <option selected>Select a format</option>
-              <option value=" 2D">2D</option>
-              <option value="3D">3D</option>
-              <option value="4DX">4DX</option>
-              <option value="IMAX">IMAX</option>
-            </select>
-          </div>
-
-          <!-- button -->
-          <button
-            type="submit"
-            class="btn btn-danger form-control mt-3"
-            style="border-radius: 0%"
-          >
-            Add
-          </button>
-        </form>
+        </div>
       </div>
     </div>
   </body>

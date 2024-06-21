@@ -18,9 +18,64 @@
       href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="../static/style.css" />  
+    <!-- jquery for AJAX -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <link rel="stylesheet" href="../static/style.css" />
+    <style>
+      .form-control,
+      .form-select:focus {
+        box-shadow: none;
+        border-bottom: 2px solid #2dc492 !important;
+        background-color: #f3f3f3;
+        border-radius: 0%;
+        border: none;
+      }
+      .form-control,
+      .form-select::placeholder {
+        color: #999;
+        background-color: #f3f3f3;
+      }
+      .booked {
+        background-color: gray;
+      }
+      .selected {
+        background-color: yellow;
+      }
+    </style>
   </head>
   <body>
+    <script>
+      function selectSeat(rowLabel, rowId, seatNumber, element) {
+        // Remove the highlight from all seats
+        var seats = document.querySelectorAll(".seat");
+        seats.forEach(function (seat) {
+          seat.classList.remove("highlighted");
+        });
+
+        // Add the highlight to the clicked seat
+        element.classList.add("highlighted");
+
+        // AJAX request to handle the seat selection
+        $.ajax({
+          type: "POST",
+          url: "/select-seat", // Your server endpoint to handle the request
+          data: {
+            row_label: rowLabel,
+            row_id: rowId,
+            seat_number: seatNumber,
+          },
+          success: function (response) {
+            alert(
+              "You have selected seat: Row " + rowLabel + ", Seat " + seatNumber
+            );
+          },
+          error: function (error) {
+            alert("An error occurred: " + error.statusText);
+          },
+        });
+      }
+    </script>
     <!-- navbar -->
     <nav class="navbar bg-body-tertiary">
       <div class="container">
@@ -28,47 +83,120 @@
           <img src="../static/images/logo.png" width="110px" alt="Bookmyshow" />
         </span>
         <div>
-          <button type="button" class="fw-bold border-0 me-3" style="background-color: inherit;" ><a class="text-black text-decoration-none" href="/user">Home</a></button>
-            <button type="button" class="text-danger fw-bold border-0" style="background-color: inherit;" ><a class="text-danger text-decoration-none" href="/">Logout</a></button>
+          <button
+            type="button"
+            class="fw-bold border-0 me-3"
+            style="background-color: inherit"
+          >
+            <a class="text-black text-decoration-none" href="/user">Home</a>
+          </button>
+          <button
+            type="button"
+            class="text-danger fw-bold border-0"
+            style="background-color: inherit"
+          >
+            <a class="text-danger text-decoration-none" href="/">Logout</a>
+          </button>
         </div>
       </div>
     </nav>
 
     <nav>
-      <div class="left-nav-item">
-          <div class="nav-item-container"><a href="#back" class="fa fa-angle-left back-logo"></a></div>
-          <div class="nav-item-container">
-              Gold <small>(U/A)</small><br>
-              <small class="mallname light-grey-text"> INOX: Korum Mall, Eastern Express Highway, Thane</small>
+      <div class="container d-flex align-items-center justify-content-between">
+        <div>
+          {% for detail in details %} {{detail[1]}}<br />
+          {% endfor%}
+          <small class="mallname light-grey-text">
+            Book My Show Cineplex , Kochi , Kerala .</small
+          >
+        </div>
+        <div class="small-text">1 Ticket</div>
+      </div>
+    </nav>
+    <header>
+      <div class="d-flex justify-content-between align-items-center container">
+        <form
+          action="{{ url_for('reservation', movieId=details[0][0]) }}"
+          method="GET"
+        >
+          <div class="d-flex justify-content-center align-items-center">
+            <div class="me-3">
+              <input
+                class="form-control"
+                type="date"
+                id="reservation_date"
+                name="reservation_date"
+                value="{{ reservation_date }}"
+              />
+            </div>
+            <div>
+              <button class="timing-select-button active" type="submit">
+                Check Availability
+              </button>
+            </div>
           </div>
-          <div class="showmobile nav-item-container" style="text-overflow:ellipsis !important;font-size:10pt;overflow:hidden;white-space: nowrap;width:80%;"><b> INOX: Korum Mall, Eastern Express Highway, Thane</b></div>
-      </div>
-      <div class="right-nav-item">
-          <div class="nav-item-container small-text num-of-tickets pointer" style="margin-right:40px;">2 Tickets <span class="fa fa-angle-down"></span></div>
-          <div class="nav-item-container"><span class="fa fa-close pointer"></span></div>
-      </div>
-  </nav>
-  <header>
-      <div class="light-grey-text xsmall-text" id="ticket-date">Tomorrow, 30 Aug, 01:00 PM</div>
-      <button class="timing-select-button"> 09:45 AM</button>
-      <button class="timing-select-button active"> 01:00 PM</button>
-      <button class="timing-select-button"> 04:00 PM</button>
-      <button class="timing-select-button"> 07:15 PM</button>
-  </header>
+        </form>
 
-  
-    <div class="content">
-      <span class="light-grey-text">ROYAL-Rs. 160.00</span><br><hr>
-      <div class="seats" id="seats-royal" seatrow="{{ rows|length }}" seatcol="{{ rows[0]['seats']|length }}">
-          {% for row in rows %}
-          <div class='row' id='{{ row.row_id }}'>{{ row.row_label }} &nbsp; &nbsp;
-              {% for seat in row.seats %}
-              <a class='seat pointer'>{{ seat }}</a>
-              {% endfor %}
-          </div>
-          {% endfor %}
+        <button class="timing-select-button active">{{time}}</button>
       </div>
-  </div>
+    </header>
+    <div class="content">
+      <span class="light-grey-text">ROYAL-Rs. 160.00</span><br />
+      <hr />
+      <form
+        action="{{ url_for('reservation', movieId=details[0][0]) }}"
+        method="POST"
+      >
+        <input
+          type="hidden"
+          name="reservation_date"
+          value="{{ reservation_date }}"
+        />
+        <div
+          class="seats"
+          id="seats-royal"
+          seatrow="{{ rows|length }}"
+          seatcol="{{ rows[0]['seats']|length }}"
+        >
+          <div class="seating-chart">
+            {% for row in rows %}
+            <div class="row" id="{{ row.row_id }}">
+              {{ row.row_label }} &nbsp; &nbsp; {% for seat in row.seats %}
+              <a
+                onclick="selectSeat('{{ row.row_label }}', '{{ row.row_id }}', '{{ seat }}', this)"
+                class="seat pointer {% if seat.booked %}booked{% endif %}"
+                data-row="{{ row.row_label }}"
+                data-seat="{{ seat.number }}"
+                >{{ seat.number }}</a
+              >
+              {% endfor %}
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+        <input type="hidden" name="seat_row" id="seat_row" />
+        <input type="hidden" name="seat_number" id="seat_number" />
+        <button class="btn btn-danger mt-3" type="submit">Book Seat</button>
+      </form>
+    </div>
+    <script>
+      document.querySelectorAll(".seat").forEach((seat) => {
+        seat.addEventListener("click", function () {
+          if (!this.classList.contains("booked")) {
+            document.getElementById("seat_row").value =
+              this.getAttribute("data-row");
+            document.getElementById("seat_number").value =
+              this.getAttribute("data-seat");
+            document
+              .querySelectorAll(".seat.selected")
+              .forEach((selectedSeat) => {
+                selectedSeat.classList.remove("selected");
+              });
+            this.classList.add("selected");
+          }
+        });
+      });
+    </script>
   </body>
   <script
     src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"

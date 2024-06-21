@@ -125,20 +125,8 @@ nav {
   padding: 15px;
   color: #fff;
 }
-nav .nav-item-container {
-  display: inline-block;
-  margin-right: 20px;
-  vertical-align: middle;
-  /* float:left; */
-}
-.left-nav-item {
-  display: inline-block;
-  position: relative;
-  vertical-align: middle !important;
-}
-.right-nav-item {
-  float: right !important;
-  margin-top: 9px;
+.pointer{
+  cursor: pointer;
 }
 .mallname {
   font-size: 9pt;
@@ -149,20 +137,6 @@ nav .nav-item-container {
 }
 .small-text {
   font-size: 10pt;
-}
-.xsmall-text {
-  font-size: 9pt;
-}
-.pointer {
-  cursor: pointer;
-}
-.showmobile {
-  display: none !important;
-}
-.back-logo {
-  font-size: 20pt;
-  color: #fff;
-  text-align: center;
 }
 /* Navbar style end*/
 header {
