@@ -1,0 +1,93 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pdb
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environment
+venv/
+env/
+.venv/
+.env/
+
+# Flask configuration files
+.flaskenv
+instance/
+config.py
+
+# Environments
+*.env
+*.env.*
+
+# Logs and databases
+*.log
+*.sql
+*.sqlite3
+instance/*.db
+instance/*.sqlite3
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.coverage
+.coverage.*
+.cache
+.nox/
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+pytest-debug.log
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# IDEs and editors
+.idea/
+.vscode/
+.project
+.pydevproject
+.ropeproject/
+*.sublime-project
+*.sublime-workspace
+
+# macOS
+.DS_Store
+
+# Static and media files
+static/media/
+uploads/
+
+# Optional: Specific file types and patterns
+*.tmp
+*.bak
+*.swp
+*.ico
+*.svg
+*.log
+*.pot
+*.mo
+*.ser
