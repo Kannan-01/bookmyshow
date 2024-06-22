@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>BookMyShow</title>
-    <link rel="icon" type="image/x-icon" href="../static/images/fav/fav.png">
+    <link rel="icon" type="image/x-icon" href="../static/images/fav/fav.png" />
     <!-- bootstrap -->
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
@@ -36,17 +36,155 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
     <link rel="stylesheet" href="../static/style.css" />
+    <style>
+
+      body {
+        background: #ccc;
+      }
+
+      .msg {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        color: #555;
+        text-transform: uppercase;
+        z-index: 4;
+      }
+
+      .m-ticket {
+        min-width: 350px;
+        min-height: 550px;
+        background: #fff;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 0 25px #bbb;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        position: relative;
+      }
+      .card-container {
+        display: flex;
+        flex-wrap: nowrap;
+        gap: 20px;
+        padding: 20px;
+        overflow-x: auto;
+        overflow-y: hidden; 
+        scroll-snap-type: x mandatory;
+      }
+      .m {
+        position: absolute;
+        right: -5px;
+        top: 15%;
+        transform: rotate(270.5deg);
+        font-size: 0.8em;
+        color: #888;
+      }
+
+      .m-ticket > .movie-details {
+        display: flex;
+        gap: 20px;
+        padding: 20px 20px;
+      }
+
+      .m-ticket > .movie-details > .poster {
+        width: 100%;
+        height: 120px;
+        object-fit: contain;
+        border-radius: 8px;
+        box-shadow: 0 0 10px #888;
+      }
+
+      .m-ticket > .movie-details > .movie > h4 {
+        text-transform: capitalize;
+        font-size: 1.6em;
+        margin-bottom: 20px;
+        width: 200px;
+        height: 61.425px;
+      }
+
+      .m-ticket > .movie-details > .movie > p {
+        font-size: 0.8em;
+        line-height: 19px;
+        color: #777;
+      }
+
+      .m-ticket > .info {
+        width: 93%;
+        border-radius: 20px;
+        background: #eee;
+        padding: 10px 0px;
+        text-align: center;
+        font-size: 0.72em;
+      }
+
+      .m-ticket > .ticket-details {
+        display: flex;
+        gap: 20px;
+        padding: 20px 20px;
+      }
+
+      .m-ticket > .ticket-details > .scan {
+        width: 100px;
+        height: 100px;
+      }
+
+      .m-ticket > .ticket-details > .ticket {
+        text-align: center;
+        width: 200px;
+      }
+
+      .m-ticket > .ticket-details > .ticket > p {
+        font-size: 0.8em;
+        line-height: 19px;
+        color: #777;
+      }
+
+      .m-ticket > .ticket-details > .ticket > b {
+        margin-top: 10px;
+        display: inline-block;
+        font-size: 1.2em;
+        font-weight: 400;
+      }
+
+      .m-ticket > .ticket-details > .ticket > h6 {
+        text-transform: uppercase;
+        font-weight: 100;
+        font-size: 0.95em;
+        margin-top: 10px;
+      }
+
+      .m-ticket > .info-cancel {
+        width: 100%;
+        background: #eee;
+        color: #888;
+        padding: 10px 0px;
+        text-align: center;
+        font-size: 0.8em;
+      }
+
+      .m-ticket > .total-amount {
+        display: flex;
+        justify-content: space-between;
+        padding: 12px 20px;
+        font-weight: 700;
+        font-size: 0.9em;
+        width: 100%;
+      }
+    </style>
   </head>
   <body>
-
-
     <!-- navbar -->
     <nav class="navbar bg-body-tertiary">
       <div class="container">
         <span class="navbar-brand mb-0 h1">
           <a class="text-decoration-none" href="/user">
-            <img src="../static/images/logo.png" width="110px" alt="Bookmyshow" />
-            </a>   
+            <img
+              src="../static/images/logo.png"
+              width="110px"
+              alt="Bookmyshow"
+            />
+          </a>
         </span>
         <div class="d-flex justify-content-between">
           <div>
@@ -55,9 +193,7 @@
               class="fw-bold border-0 me-3"
               style="background-color: inherit"
             >
-              <a class="text-decoration-none text-black" href="/user"
-                >Home</a
-              >
+              <a class="text-decoration-none text-black" href="/user">Home</a>
             </button>
           </div>
           <div>
@@ -73,10 +209,89 @@
       </div>
     </nav>
 
+    <!-- tickets booked -->
+    <div class="container-fluid">
+      <h1 class="title mb-3 fw-bold">Movies Booked</h1>
+      <div class="movies-list container">
+        <div class="slider-buttons">
+          <button id="prev" style="background: #ccc">
+            <i class="fa-solid fa-chevron-left fa-2xl"></i>
+          </button>
+          <button id="next" style="background: #ccc">
+            <i class="fa-solid fa-chevron-right fa-2xl"></i>
+          </button>
+        </div>
+        <div class="card-container">
+          {% for booking in bookings %}
+          <div class="m-ticket">
+            <p class="m">M-Ticket</p>
+
+            <div class="movie-details">
+              <img
+                src="{{booking[10]}}"
+                class="poster"
+              />
+
+              <div class="movie">
+                <h4>{{booking[5]}}</h4>
+                <p>{{booking[7]}} , {{booking[8]}}</p>
+                <p>{{booking[3]}} | {{booking[11]}}</p>
+                <p>Book My Show Cineplex : Kochi</p>
+              </div>
+            </div>
+
+            <div class="info">Tap for support, details & more actions</div>
+
+            <div class="ticket-details">
+              <img
+                src="https://pngimg.com/uploads/qr_code/qr_code_PNG2.png"
+                class="scan"
+              />
+
+              <div class="ticket">
+                <p>1Ticket</p>
+
+                <b>SCREEN 1</b>
+
+                <p>Royal- {{booking[1]}} {{booking[2]}}</p>
+
+                <h6>BOOKING ID: {{booking[4]}}</h6>
+              </div>
+            </div>
+
+            <div class="info-cancel">
+              Cancellation not available for this venue
+            </div>
+
+            <div class="total-amount">
+              <p>Total Amount</p>
+
+              <p>Rs. 160 /-</p>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
   </body>
   <script
     src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
     integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
     crossorigin="anonymous"
   ></script>
+  <script>
+    document.getElementById("next").addEventListener("click", () => {
+      document.querySelector(".card-container").scrollBy({
+        left: 450,
+        behavior: "smooth",
+      });
+    });
+
+    document.getElementById("prev").addEventListener("click", () => {
+      document.querySelector(".card-container").scrollBy({
+        left: -450,
+        behavior: "smooth",
+      });
+    });
+  </script>
 </html>

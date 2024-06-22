@@ -40,7 +40,30 @@ def orders():
 
 @app.route('/orders')
 def bookings():
-    return render_template('orders.html')
+    query = """
+    SELECT 
+        r.id AS reservation_id,
+        r.seat_row,
+        r.seat_number,
+        r.reservation_date,
+        m.movie_id,
+        m.movie_name,
+        m.length,
+        m.language,
+        m.format,
+        m.genre,
+        m.poster_path,
+        s.time AS schedule_time
+    FROM 
+        reservations r
+    JOIN 
+        movies m ON r.movie_id = m.movie_id
+    JOIN 
+        schedules s ON r.movie_id = s.movie_id;
+    """
+    bookings = runQuery(query)
+    return render_template('orders.html', bookings=bookings)
+
 
 @app.route('/delete_schedule', methods=['POST'])
 def delete_schedule():
@@ -251,21 +274,25 @@ def schedule_exists(movie_id):
 
 @app.route('/schedule', methods=['GET', 'POST'])
 def schedule():
+    message = None
+    error = None 
+
     if request.method == 'POST':
         movie_id = request.form.get('movieid')
         time = request.form.get('time')
 
         if schedule_exists(movie_id):
-            return jsonify({'error': 'Movie already exists in the database.'}), 400
-
-        query = "INSERT INTO schedules (movie_id, time) VALUES (%s, %s)"
-        params = (movie_id, time)
-        runQuery(query, params)
-        return jsonify({'message': 'Movie Hosted successfully!'})
+            error = 'Movie already Hosted.'
+        else:
+            query = "INSERT INTO schedules (movie_id, time) VALUES (%s, %s)"
+            params = (movie_id, time)
+            runQuery(query, params)
+            message = 'Movie hosted successfully!'
 
     query = "SELECT * FROM movies"
     movies = runQuery(query)
-    return render_template('schedule.html', movies=movies)
+    return render_template('schedule.html', movies=movies, message=message, error=error)
+
 
 
 @app.route('/success', methods=['GET'])
