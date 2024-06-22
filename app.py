@@ -1,6 +1,6 @@
 import mysql.connector
 from mysql.connector import Error
-from flask import Flask, request, jsonify, render_template, redirect, url_for
+from flask import Flask, request, jsonify, render_template, redirect, url_for, send_from_directory
 from werkzeug.utils import secure_filename
 import os
 from random import randint
@@ -16,6 +16,11 @@ def index():
     return render_template('index.html')
 
 
+@app.route('/uploads/<filename>')
+def uploaded_file(filename):
+    return send_from_directory('uploads', filename)
+
+
 @app.route('/', methods=['POST'])
 def login():
     username = request.form.get('username')
@@ -29,21 +34,28 @@ def login():
         return render_template('index.html', login_failed=True)
 
 
-@app.route('/bookings')
+@app.route('/booking')
 def bookings():
-    return render_template('bookings.html')
+    return render_template('booking.html')
 
+@app.route('/delete_schedule', methods=['POST'])
+def delete_schedule():
+    movie_id = request.form['movie_id']
+    query = "DELETE FROM schedules WHERE movie_id = %s;"
+    runQuery(query, (movie_id,))
+    return jsonify({'status': 'success'})
 
 @app.route('/admin')
 def admin():
     query = """
-    SELECT 
+SELECT 
         movies.movie_id,
         movies.movie_name,
         movies.length,
         movies.language,
         movies.format,
         movies.genre,
+        movies.poster_path,
         schedules.time
     FROM 
         movies
@@ -70,6 +82,7 @@ def user():
         movies.language,
         movies.format,
         movies.genre,
+        movies.poster_path,
         schedules.time
     FROM 
         movies
@@ -79,6 +92,7 @@ def user():
         movies.movie_id = schedules.movie_id;
     """
     movies = runQuery(query)
+    print(movies)
     return render_template('user.html', movies=movies)
 
 
@@ -103,6 +117,21 @@ def reservation(movieId):
         query = "INSERT INTO reservations (movie_id, seat_row, seat_number, reservation_date) VALUES (%s, %s, %s, %s)"
         params = (movieId, seat_row, seat_number, reservation_date)
         runQuery(query, params)
+        query = "SELECT time FROM schedules WHERE movie_id=%s"
+        params = (movieId,)
+        timedata = runQuery(query, params)
+        timedelta_obj = timedata[0][0]
+        total_seconds = timedelta_obj.total_seconds()
+        hours = int(total_seconds // 3600)
+        minutes = int((total_seconds % 3600) // 60)
+        time_string = f"{hours:02}:{minutes:02}"
+        query = "SELECT * FROM movies WHERE movie_id=%s"
+        params = (movieId,)
+        moviedata = runQuery(query, params)
+        booking = [movieId, seat_row, seat_number,
+                   reservation_date, time_string]
+        print(moviedata)
+        return render_template('booking.html', booking=booking, moviedata=moviedata)
 
     # Fetch movie and schedule details
     query = """
@@ -124,16 +153,14 @@ def reservation(movieId):
     # Create a set of booked seats
     booked_seat_set = set()
     for seat in booked_seats:
-        # Assuming seat[0] is seat_row and seat[1] is seat_number
         booked_seat_set.add((seat[0], seat[1]))
 
-    seatrow = 10  # Number of rows (example value)
-    seatcol = 18  # Number of columns (example value)
+    seatrow = 10
+    seatcol = 18
     rows = []
     for i in range(seatrow):
         row_data = {
             'row_id': f'row-{i}',
-            # Generating row labels like A, B, C, ...
             'row_label': chr(65 + i),
             'seats': []
         }

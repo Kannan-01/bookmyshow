@@ -25,10 +25,28 @@
 
 .movies-list {
   width: 94%;
-  height: 500px;
   position: relative;
-  padding-top: 0;
-  padding-left: 105px;
+}
+
+.slider-buttons {
+  position: absolute;
+  width: 100%;
+  display: flex;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  justify-content: space-between;
+  z-index: 1;
+}
+
+.slider-buttons button {
+  background-color:white;
+  color:black;
+  border: none;
+  padding: 10px;
+  cursor: pointer;
+  font-size: 18px;
+  border-radius: 5px;
 }
 
 .movie {
@@ -39,12 +57,11 @@
 .card-container {
   position: relative;
   width: 95%;
-  padding-left: 10px;
-  height: 480px;
-  display: grid;
+  display: flex;
   margin: 0 auto;
   align-items: center;
-  grid-template-columns: repeat(4, 1fr);
+  overflow-x: auto;
+  overflow-y: visible;
   scroll-behavior: smooth;
 }
 
@@ -99,7 +116,6 @@
 .detail {
   font-size: 15px;
   color: #b1aead;
-  margin-bottom: 30px;
 }
 
 .strip {
