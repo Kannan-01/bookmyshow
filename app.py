@@ -35,8 +35,12 @@ def login():
 
 
 @app.route('/booking')
-def bookings():
+def orders():
     return render_template('booking.html')
+
+@app.route('/orders')
+def bookings():
+    return render_template('orders.html')
 
 @app.route('/delete_schedule', methods=['POST'])
 def delete_schedule():
@@ -44,6 +48,7 @@ def delete_schedule():
     query = "DELETE FROM schedules WHERE movie_id = %s;"
     runQuery(query, (movie_id,))
     return jsonify({'status': 'success'})
+
 
 @app.route('/admin')
 def admin():
@@ -198,20 +203,23 @@ def add():
         language = request.form.get('lang')
         format = request.form.get('format')
         genre = request.form.get('genre')
+        # Use request.files.get to safely get file object
+        file = request.files.get('poster')
+
+        # Check if any field is empty or not selected
+        if not movie_name or not length or not language or language == 'Select a Language' or not format or format == 'Select a format' or not genre or not (file and file.filename):
+            return render_template('addmovie.html', error='Please fill out all fields before submitting the form.')
+
         movie_id = randint(0, 2147483646)
 
         # Handle file upload
-        if 'poster' not in request.files:
-            return jsonify({'error': 'No file part'}), 400
-        file = request.files['poster']
-        if file.filename == '':
-            return jsonify({'error': 'No selected file'}), 400
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            poster_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            file.save(file_path)
+            poster_path = file_path  # Use the saved file path for the database
         else:
-            return jsonify({'error': 'Invalid file type'}), 400
+            return jsonify({'error': 'Invalid file type or no file selected'}), 400
 
         if movie_exists(movie_name):
             return jsonify({'error': 'Movie already exists in the database.'}), 400
@@ -221,11 +229,11 @@ def add():
                   language, format, genre, poster_path)
         runQuery(query, params)
 
-        query = "SELECT * FROM movies WHERE movie_id = %s"
+        query = "SELECT * FROM `movies` WHERE movie_id=%s"
         params = (movie_id,)
-        uploadData = runQuery(query, params)
-        print(uploadData)
-        return render_template('addmovie.html', uploadData=uploadData)
+        success = runQuery(query, params)
+
+        return render_template('success.html', success=success)
 
     return render_template('addmovie.html')
 
@@ -260,7 +268,12 @@ def schedule():
     return render_template('schedule.html', movies=movies)
 
 
+@app.route('/success', methods=['GET'])
+def success():
+    return render_template('success.html')
 # sql connections
+
+
 def runQuery(query, params=None):
     try:
         db = mysql.connector.connect(
