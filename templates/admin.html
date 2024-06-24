@@ -106,8 +106,9 @@
                 <p>{{ movie[3]}}</p>
               </div>
             </div>
-            <h3>{{ movie[1]}}</h3>
-       <p class="detail text-danger fw-bold btn-link text-decoration-none" style="cursor: pointer" onclick="deleteSchedule('{{ movie[0] }}')">Cancel</p>
+            <p class="fw-bold mb-0">{{ movie[1]}}</p>
+            <p class="mb-0">{{movie[7]}}</p>
+       <p class="detail text-danger fw-bold btn-link text-decoration-none mb-0" style="cursor: pointer" onclick="deleteSchedule('{{ movie[0] }}')">Cancel</p>
 
           </div>
           {% endfor %}
