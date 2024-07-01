@@ -32,12 +32,9 @@
       nomodule
       src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"
     ></script>
-    <!-- jquery for AJAX -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
+    <!-- css link -->
     <link rel="stylesheet" href="../static/style.css" />
     <style>
-
       body {
         background: #ccc;
       }
@@ -69,7 +66,7 @@
         gap: 20px;
         padding: 20px;
         overflow-x: auto;
-        overflow-y: hidden; 
+        overflow-y: hidden;
         scroll-snap-type: x mandatory;
       }
       .m {
@@ -227,10 +224,7 @@
             <p class="m">M-Ticket</p>
 
             <div class="movie-details">
-              <img
-                src="{{booking[10]}}"
-                class="poster"
-              />
+              <img src="{{booking[10]}}" class="poster" />
 
               <div class="movie">
                 <h4>{{booking[5]}}</h4>

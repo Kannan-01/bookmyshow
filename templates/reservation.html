@@ -19,9 +19,7 @@
       href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
       rel="stylesheet"
     />
-    <!-- jquery for AJAX -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
+    <!-- css link -->
     <link rel="stylesheet" href="../static/style.css" />
     <style>
       .form-control,
@@ -53,28 +51,8 @@
         seats.forEach(function (seat) {
           seat.classList.remove("highlighted");
         });
-
         // Add the highlight to the clicked seat
         element.classList.add("highlighted");
-
-        // AJAX request to handle the seat selection
-        $.ajax({
-          type: "POST",
-          url: "/select-seat", // Your server endpoint to handle the request
-          data: {
-            row_label: rowLabel,
-            row_id: rowId,
-            seat_number: seatNumber,
-          },
-          success: function (response) {
-            alert(
-              "You have selected seat: Row " + rowLabel + ", Seat " + seatNumber
-            );
-          },
-          error: function (error) {
-            alert("An error occurred: " + error.statusText);
-          },
-        });
       }
     </script>
     <!-- navbar -->

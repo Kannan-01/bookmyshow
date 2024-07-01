@@ -4,23 +4,23 @@ from flask import Flask, request, jsonify, render_template, redirect, url_for, s
 from werkzeug.utils import secure_filename
 import os
 from random import randint
-from datetime import date, datetime, timedelta
+from datetime import date ,datetime
 
 app = Flask(__name__)
 app.debug = True
 app.config['UPLOAD_FOLDER'] = 'uploads/'
 
-
+# root page
 @app.route('/')
 def index():
     return render_template('index.html')
 
-
+# file uploading API endpoint
 @app.route('/uploads/<filename>')
 def uploaded_file(filename):
     return send_from_directory('uploads', filename)
 
-
+# login function
 @app.route('/', methods=['POST'])
 def login():
     username = request.form.get('username')
@@ -33,15 +33,26 @@ def login():
     else:
         return render_template('index.html', login_failed=True)
 
-
+# Ticket Confirmation Page
 @app.route('/booking')
 def orders():
     return render_template('booking.html')
 
+# my bookings page
 @app.route('/orders')
 def bookings():
+    # Delete expired reservations
+    delete_query = """
+    DELETE FROM reservations
+    WHERE reservation_date < CURDATE();
+    """
+    # Execute the delete query
+    runQuery(delete_query)
+    today_date = datetime.now().date().isoformat()
+    
+    # show remaing reservations
     query = """
-    SELECT 
+    SELECT
         r.id AS reservation_id,
         r.seat_row,
         r.seat_number,
@@ -54,25 +65,48 @@ def bookings():
         m.genre,
         m.poster_path,
         s.time AS schedule_time
-    FROM 
+    FROM
         reservations r
-    JOIN 
+    JOIN
         movies m ON r.movie_id = m.movie_id
-    JOIN 
-        schedules s ON r.movie_id = s.movie_id;
-    """
+    JOIN
+        schedules s ON r.movie_id = s.movie_id
+    WHERE
+        r.reservation_date >= '{}'
+    ORDER BY
+        r.reservation_date ASC;
+    """.format(today_date)
+
     bookings = runQuery(query)
     return render_template('orders.html', bookings=bookings)
 
-
+# schedule delete API end point
 @app.route('/delete_schedule', methods=['POST'])
 def delete_schedule():
     movie_id = request.form['movie_id']
     query = "DELETE FROM schedules WHERE movie_id = %s;"
     runQuery(query, (movie_id,))
-    return jsonify({'status': 'success'})
+    query = """
+SELECT 
+        movies.movie_id,
+        movies.movie_name,
+        movies.length,
+        movies.language,
+        movies.format,
+        movies.genre,
+        movies.poster_path,
+        schedules.time
+    FROM 
+        movies
+    JOIN 
+        schedules
+    ON 
+        movies.movie_id = schedules.movie_id;
+    """
+    movies = runQuery(query)
+    return render_template('admin.html', movies=movies)
 
-
+# Admin page
 @app.route('/admin')
 def admin():
     query = """
@@ -95,7 +129,7 @@ SELECT
     movies = runQuery(query)
     return render_template('admin.html', movies=movies)
 
-
+# user page
 @app.route('/user', methods=['GET', 'POST'])
 def user():
     if request.method == 'POST':
@@ -123,18 +157,7 @@ def user():
     print(movies)
     return render_template('user.html', movies=movies)
 
-
-@app.route('/select-seat', methods=['POST'])
-def select_seat():
-    row_label = request.form.get('row_label')
-    row_id = request.form.get('row_id')
-    seat_number = request.form.get('seat_number')
-    print(row_label, row_id, seat_number)
-    # Process the seat selection as needed
-
-    return jsonify(status='success', message='Seat selected successfully')
-
-
+# Seat booking / Reservation page
 @app.route('/reservation/<movieId>', methods=['GET', 'POST'])
 def reservation(movieId):
     if request.method == 'POST':
@@ -142,9 +165,13 @@ def reservation(movieId):
         seat_row = request.form.get('seat_row')
         seat_number = request.form.get('seat_number')
         reservation_date = request.form.get('reservation_date')
+        
+        # Insert reservation into database
         query = "INSERT INTO reservations (movie_id, seat_row, seat_number, reservation_date) VALUES (%s, %s, %s, %s)"
         params = (movieId, seat_row, seat_number, reservation_date)
         runQuery(query, params)
+        
+        # Fetch schedule details of a movie
         query = "SELECT time FROM schedules WHERE movie_id=%s"
         params = (movieId,)
         timedata = runQuery(query, params)
@@ -153,12 +180,13 @@ def reservation(movieId):
         hours = int(total_seconds // 3600)
         minutes = int((total_seconds % 3600) // 60)
         time_string = f"{hours:02}:{minutes:02}"
+        
+        # fetch all details of a particular movie
         query = "SELECT * FROM movies WHERE movie_id=%s"
         params = (movieId,)
         moviedata = runQuery(query, params)
         booking = [movieId, seat_row, seat_number,
                    reservation_date, time_string]
-        print(moviedata)
         return render_template('booking.html', booking=booking, moviedata=moviedata)
 
     # Fetch movie and schedule details
@@ -203,8 +231,6 @@ def reservation(movieId):
     return render_template('reservation.html', rows=rows, details=details, time=gettime, reservation_date=reservation_date)
 
 # Function to check if movie already exists
-
-
 def movie_exists(movie_name):
     query = "SELECT * FROM movies WHERE movie_name = %s"
     params = (movie_name,)
@@ -212,11 +238,8 @@ def movie_exists(movie_name):
     return len(result) > 0
 
 # for adding a movie
-
-
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in {'png', 'jpg', 'jpeg', 'gif'}
-
 
 @app.route('/add', methods=['GET', 'POST'])
 def add():
@@ -260,9 +283,7 @@ def add():
 
     return render_template('addmovie.html')
 
-# Function to check if movie already exists
-
-
+# Function to check if movie already schedules
 def schedule_exists(movie_id):
     query = "SELECT * FROM schedules WHERE movie_id = %s"
     params = (movie_id,)
@@ -270,8 +291,6 @@ def schedule_exists(movie_id):
     return len(result) > 0
 
 # schedule time for a movie
-
-
 @app.route('/schedule', methods=['GET', 'POST'])
 def schedule():
     message = None
@@ -282,25 +301,32 @@ def schedule():
         time = request.form.get('time')
 
         if schedule_exists(movie_id):
-            error = 'Movie already Hosted.'
+            error = 'Movie already hosted.'
         else:
             query = "INSERT INTO schedules (movie_id, time) VALUES (%s, %s)"
             params = (movie_id, time)
             runQuery(query, params)
             message = 'Movie hosted successfully!'
 
-    query = "SELECT * FROM movies"
+    # Update the query to fetch movies that are not scheduled
+    query = """
+            SELECT * 
+            FROM movies 
+            WHERE movie_id NOT IN (
+                SELECT movie_id FROM schedules
+            )
+            """
     movies = runQuery(query)
+    print(movies)
     return render_template('schedule.html', movies=movies, message=message, error=error)
 
 
-
+# Movie added succesfully page
 @app.route('/success', methods=['GET'])
 def success():
     return render_template('success.html')
+
 # sql connections
-
-
 def runQuery(query, params=None):
     try:
         db = mysql.connector.connect(
