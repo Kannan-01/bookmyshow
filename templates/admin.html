@@ -85,20 +85,22 @@
                 <p>{{ movie[1] }}</p>
               </div>
             </div>
-            <p class="mb-0">{{ movie[7] }}</p>
-            <form
-              action="/delete_schedule"
-              method="post"
-              onsubmit="return confirm('Are you sure you want to delete this schedule?')"
-            >
-              <input type="hidden" name="movie_id" value="{{ movie[0] }}" />
-              <button
-                type="submit"
-                class="btn btn-link text-decoration-none text-danger fw-bold p-0"
+
+            <div>
+              <form
+                action="/delete_schedule"
+                method="post"
+                onsubmit="return confirm('Are you sure you want to delete this schedule?')"
               >
-                Cancel Hosting
-              </button>
-            </form>
+                <input type="hidden" name="movie_id" value="{{ movie[0] }}" />
+                <button
+                  type="submit"
+                  class="btn btn-link text-decoration-none text-danger fw-bold p-0"
+                >
+                  Cancel Hosting
+                </button>
+              </form>
+            </div>
           </div>
           {% endfor %}
         </div>
